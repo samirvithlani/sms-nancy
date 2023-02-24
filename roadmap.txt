@@ -1,0 +1,33 @@
+npm packages
+cors
+express
+mongoose
+path
+ZOD
+jwt
+
+RoleSchema
+
+
+
+schemas
+role  -->d
+student  -->n CRUD login
+faculty  -->d CRUD login
+admin   --> n CRUD login
+
+
+RoleController.js
+controllers
+role
+student
+faculty
+admin
+
+RoleRoutes
+
+routes
+role
+student
+faculty
+admin
