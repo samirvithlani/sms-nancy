@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const {string}=require("zod");
 const schema = mongoose.Schema;
 const StudentsSchema = schema({
 
@@ -11,7 +12,7 @@ const StudentsSchema = schema({
         required: true
     },
     contact: {
-        type: Number,
+        type: String,
         required: true
     },
     email:{
@@ -24,7 +25,7 @@ const StudentsSchema = schema({
     },
     age:{
         type: Number,
-        required: true
+       
     },
     role:{
         type: schema.Types.ObjectId,

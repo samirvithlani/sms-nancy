@@ -9,8 +9,10 @@ require('dotenv').config()
 const PORT = process.env.PORT||3000;
 
 const AdminRoutes = require("./routes/admin/AdminRoutes")
+const StudentRoutes = require("./routes/student/StudentRoutes")
 
 app.use("/admin",AdminRoutes)
+app.use("/student",StudentRoutes)
 
 //database
 mongoose.connect('mongodb://127.0.0.1:27017/SMS-Nancy',(err)=>{

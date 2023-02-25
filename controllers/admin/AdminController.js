@@ -80,6 +80,7 @@ exports.deleteAdmin=(req, res)=>{
     })
 }
 
+
 //login
 exports.AdminLogin=(req,res)=>{
     AdminSchema.findOne({email:req.body.email},(err, data)=>{
@@ -108,5 +109,21 @@ exports.AdminLogin=(req,res)=>{
             }
         }
 
+    })
+}
+
+//update Admin
+exports.UpdateAdmin= (req,res)=>{
+    AdminSchema.findByIdAndUpdate(req.params.id,req.body,(err,data)=>{
+        if(err){
+            res.status(400).json({
+                msg:err.message
+            })}
+            else{
+                res.status(200).json({
+                    msg:"Admin updated successfully",
+                    data:data
+                })
+            }
     })
 }
