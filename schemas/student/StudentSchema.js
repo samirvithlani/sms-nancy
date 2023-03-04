@@ -35,7 +35,12 @@ const StudentsSchema = schema({
         type: String,
 
     },
-    
+    courses: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Course'
+        }
+      ]
 },
 {
     timestamps:true

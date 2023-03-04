@@ -1,7 +1,7 @@
 const Bcrypt = require("bcrypt")
 const StudentsSchema = require("../../schemas/student/StudentSchema")
 //add student
-exports.addstudent=(req,res)=>{
+exports.addStudent=(req,res)=>{
     const salt = Bcrypt.genSaltSync(10)
     const hash = Bcrypt.hashSync(req.body.password, salt)
     var StudentObj ={
@@ -30,7 +30,7 @@ exports.addstudent=(req,res)=>{
     })
 }
 
-//get All astudents
+//get All students
 exports.getStudents=(req,res)=>{
     StudentsSchema.find((err, data)=>{
         if(err){
