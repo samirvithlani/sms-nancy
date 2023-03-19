@@ -1,22 +1,22 @@
 const Attendance = require("../schemas/AttendanceSchema");
-const Course = require("../schemas/CourseSchema");
+const Batch = require("../schemas/BatchSchema");
 const Student = require("../schemas/student/StudentSchema");
 const facultySchema = require("../schemas/faculty/FacultySchema");
 
 exports.takeAttendance = async (req, res) => {
   try {
-    const { courseId, facultyId, date, students } = req.body;
+    const { batchId, facultyId, date, students } = req.body;
     const studentIds = req.body.students.map((student) => student.student);
-    if (!courseId || !facultyId || !students || !date || students.length == 0) {
+    if (!batchId || !facultyId || !students || !date || students.length == 0) {
       return res.status(400).json({
         message: "Missing required fields",
       });
     }
 
-    const course = await Course.findById(courseId);
-    if (!course) {
+    const batch = await Batch.findById(batchId);
+    if (!batch) {
       return res.status(404).json({
-        message: "Course not found",
+        message: "Batch not found",
       });
     }
     const faculty = await facultySchema.findById(facultyId);
@@ -25,40 +25,28 @@ exports.takeAttendance = async (req, res) => {
         message: "Faculty not found",
       });
     }
-    const inCourseStudent = course.students.map((student) =>
-      student.toString()
+    const inBatchStudent = batch.students.map((student) =>
+      student.toString()  
     );
-    console.log("in course students", inCourseStudent);
+    console.log("in batch students", inBatchStudent);
 
     const matchedStudentIds = [...new Set(studentIds.filter((studentId) =>
-      inCourseStudent.includes(studentId.toString())
+      inBatchStudent.includes(studentId.toString())
     ))];
     console.log("matched studentIds", matchedStudentIds);
 
     const invalidStudentIds = studentIds.filter(
-      (student) => !inCourseStudent.includes(student.toString())
+      (student) => !inBatchStudent.includes(student.toString())
     );
     console.log("invalidStudentIds", invalidStudentIds);
     if (invalidStudentIds.length > 0) {
       return res.status(400).json({
-        message: `Student(s) ${invalidStudentIds} not found in course`,
-      });
-    }
-
-    const existingAttendance = await Attendance.findOne({
-      courseId: courseId,
-      facultyId: facultyId,
-      date: date,
-    });
-
-    if (existingAttendance) {
-      return res.status(400).json({
-        message: "Attendance already taken",
+        message: `Student(s) ${invalidStudentIds} not found in batch`,
       });
     }
 
     const attendance = new Attendance({
-      courseId: courseId,
+      batchId: batchId,
       facultyId: facultyId,
       date,
       students: matchedStudentIds.map((studentId) => ({
@@ -69,8 +57,8 @@ exports.takeAttendance = async (req, res) => {
 
     const savedAttendance = await attendance.save();
 
-    await Course.findByIdAndUpdate(
-      courseId,
+    await Batch.findByIdAndUpdate(
+      batchId,
       { $addToSet: { attendances: savedAttendance._id } },
       { new: true }
     );
