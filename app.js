@@ -14,14 +14,15 @@ const RoleRoutes = require("./routes/RoleRoutes");
 const FacultyRoutes = require("./routes/faculty/FacultyRoutes");
 const CourseRoutes = require("./routes/CourseRoutes");
 const AttendanceRoutes = require("./routes/AttendanceRoutes");
-
+const BatchRoutes = require("./routes/BatchRoutes");
 
 app.use("/admin", AdminRoutes);
 app.use("/student", StudentRoutes);
 app.use("/roles", RoleRoutes);
 app.use("/faculty", FacultyRoutes);
 app.use("/course", CourseRoutes);
-app.use("/attendance", AttendanceRoutes)
+app.use("/attendance", AttendanceRoutes);
+app.use("/batch", BatchRoutes);
 
 mongoose.connect("mongodb://127.0.0.1:27017/SMS-Nancy", (err) => {
   if (err) {

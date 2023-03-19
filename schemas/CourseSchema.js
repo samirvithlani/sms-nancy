@@ -21,6 +21,12 @@ const courseSchema = new mongoose.Schema(
         ref: "Student",
       },
     ],
+    batches:[
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Batch",
+      },
+    ],
     attendances: [
       {
         type: mongoose.Schema.Types.ObjectId,
