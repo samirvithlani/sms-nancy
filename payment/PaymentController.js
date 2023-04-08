@@ -1,3 +1,5 @@
+
+const stripe = require('stripe')('sk_test_51MhbUnSF0fujg859L7D7dUFNl8P3c2qQd7Ed8M4Qspnb4ETx94jJGqeYEZP7riSJ58fdKgHMQgCdPmDPyJTEmuU500zjiBMcFX')
 exports.payment = async(req, res)=> {
     const { product } = req.body; 
     const session = await stripe.checkout.sessions.create({ 

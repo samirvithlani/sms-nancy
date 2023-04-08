@@ -1,6 +1,9 @@
 const Bcrypt = require("bcrypt")
 const AdminSchema = require("../../schemas/admin/AdminSchema")
 //add admin
+exports.test =(req,res)=>{
+    console.log("ok...")
+}
 exports.addAdmin=(req,res)=>{
     const salt = Bcrypt.genSaltSync(10)
     const hash = Bcrypt.hashSync(req.body.password, salt)
@@ -9,7 +12,7 @@ exports.addAdmin=(req,res)=>{
         lastName:req.body.lastName,
         email:req.body.email,
         password:hash,
-        status:req.body.status,
+        status:"Active",
         role:req.body.role
     }
     const Admin = new AdminSchema(AdminObj)
