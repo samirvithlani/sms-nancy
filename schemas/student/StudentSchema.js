@@ -25,7 +25,7 @@ const StudentsSchema = schema({
     },
     age:{
         type: Number,
-       
+        require: true
     },
     role:{
         type: schema.Types.ObjectId,
@@ -46,4 +46,4 @@ const StudentsSchema = schema({
     timestamps:true
 }
 )
-module.exports=mongoose.model("Student",StudentsSchema)
+module.exports=mongoose.model("student",StudentsSchema)

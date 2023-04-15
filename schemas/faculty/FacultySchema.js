@@ -33,4 +33,4 @@ const facultySchema1 = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Faculty", facultySchema1), {facultyValidator}
+module.exports = mongoose.model("faculty", facultySchema1), {facultyValidator}

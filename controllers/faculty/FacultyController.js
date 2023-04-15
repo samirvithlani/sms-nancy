@@ -5,14 +5,15 @@ const {
 const ZodError = require("zod");
 
 const bcrypt = require("bcrypt");
+const FacultySchema=require("../../schemas/faculty/FacultySchema");
 const SALT_ROUNDS = 10;
 
 exports.addFaculty = (req, res) => {
   // validate request body
-  const validateFaculty = facultyValidator.parse(req.body);
-  if (validateFaculty) {
+  console.log(req.body.email)
+ 
     // check if faculty already exists
-    facultySchema.findOne({ email: req.body.email }, async (err, data) => {
+    FacultySchema.findOne({ email: req.body.email }, async (err, data) => {
       if (err) {
         return res.status(400).send("Bad request");
       } else if (data) {
@@ -23,7 +24,7 @@ exports.addFaculty = (req, res) => {
             req.body.password,
             SALT_ROUNDS
           );
-          const faculty = new facultySchema({
+          const faculty = new FacultySchema({
             name: req.body.name,
             email: req.body.email,
             password: hashedPassword,
@@ -48,16 +49,7 @@ exports.addFaculty = (req, res) => {
         }
       }
     });
-  } else {
-    if (validateFaculty instanceof ZodError) {
-      const messages = validateFaculty.errors.map((error) => error.message);
-      console.log(`Zod validation errors: ${messages}`);
-      res.status(400).json({ messages: messages });
-    } else {
-      console.log(`Unexpected error: ${error.message}`);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  }
+  
 };
 
 exports.getFacultyById = (req, res) => {
@@ -122,3 +114,34 @@ exports.deleteFaculty = (req, res) => {
     }
   });
 };
+
+//login
+exports.facultyLogin = (req, res) => {
+  FacultySchema.findOne({email: req.body.email},(err, data) => {
+    if (err){
+        res.status(400).json({
+          msg:err.message
+        })
+  }
+  else{
+    if(data){
+        if(bcrypt.compareSync(req.body.password,data.password)){
+            res.status(200).json({
+                msg:"Faculty login successfully",
+                data:data
+            })
+        }
+        else{
+            res.status(400).json({
+                msg:"Invalid credentials"
+            })
+        }
+    }else{
+        res.status(400).json({
+            msg:"Invalid credentials"
+        })
+    }
+}
+
+})
+}

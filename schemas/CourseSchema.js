@@ -15,18 +15,7 @@ const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Faculty",
     },
-    students: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Student",
-      },
-    ],
-    attendances: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Attendance",
-      },
-    ],
+    
   },
   {
     timestamps: true,

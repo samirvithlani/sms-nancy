@@ -1,88 +1,109 @@
-const Attendance = require("../schemas/AttendanceSchema");
-const Course = require("../schemas/CourseSchema");
-const Student = require("../schemas/student/StudentSchema");
-const facultySchema = require("../schemas/faculty/FacultySchema");
+const StudentAttendanceSchema = require("../schemas/AttendanceSchema");
+const BatchSchema=require("../schemas/faculty/BatchSchema");
 
-exports.takeAttendance = async (req, res) => {
-  try {
-    const { courseId, facultyId, date, students } = req.body;
-    const studentIds = req.body.students.map((student) => student.student);
-    if (!courseId || !facultyId || !students || !date || students.length == 0) {
-      return res.status(400).json({
-        message: "Missing required fields",
+exports.addAttendance = (req, res) => {
+  const { presentStudent, absentStudent, batch, absentReason, date, time } =
+    req.body;
+
+  const newAttendance = new StudentAttendanceSchema({
+    presentStudent,
+    absentStudent,
+    batch,
+    absentReason,
+    date,
+    time,
+  });
+
+  newAttendance
+    .save()
+    .then((attendance) => {
+      res.status(200).json({
+        success: true,
+        message: "Attendance added successfully",
+        attendance,
       });
-    }
-
-    const course = await Course.findById(courseId);
-    if (!course) {
-      return res.status(404).json({
-        message: "Course not found",
+    })
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        message: "Failed to add attendance",
+        errorMessage: err.message,
       });
-    }
-    const faculty = await facultySchema.findById(facultyId);
-    if (!faculty) {
-      return res.status(404).json({
-        message: "Faculty not found",
-      });
-    }
-    const inCourseStudent = course.students.map((student) =>
-      student.toString()
-    );
-    console.log("in course students", inCourseStudent);
-
-    const matchedStudentIds = [...new Set(studentIds.filter((studentId) =>
-      inCourseStudent.includes(studentId.toString())
-    ))];
-    console.log("matched studentIds", matchedStudentIds);
-
-    const invalidStudentIds = studentIds.filter(
-      (student) => !inCourseStudent.includes(student.toString())
-    );
-    console.log("invalidStudentIds", invalidStudentIds);
-    if (invalidStudentIds.length > 0) {
-      return res.status(400).json({
-        message: `Student(s) ${invalidStudentIds} not found in course`,
-      });
-    }
-
-    const existingAttendance = await Attendance.findOne({
-      courseId: courseId,
-      facultyId: facultyId,
-      date: date,
     });
-
-    if (existingAttendance) {
-      return res.status(400).json({
-        message: "Attendance already taken",
-      });
-    }
-
-    const attendance = new Attendance({
-      courseId: courseId,
-      facultyId: facultyId,
-      date,
-      students: matchedStudentIds.map((studentId) => ({
-        student: studentId,
-        status: "Present",
-      })),
-    });
-
-    const savedAttendance = await attendance.save();
-
-    await Course.findByIdAndUpdate(
-      courseId,
-      { $addToSet: { attendances: savedAttendance._id } },
-      { new: true }
-    );
-
-    return res.status(201).json({
-      message: "Attendance taken successfully",
-      data: savedAttendance,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(400).json({
-      message: error.message,
-    });
-  }
 };
+exports.getStudentAttendanceByBatch = (req, res) => {
+  const { batch } = req.body;
+  StudentAttendanceSchema.find({ batch })
+    .populate("presentStudent")
+    .populate("absentStudent")
+    .populate("batch")
+    .exec((err, data) => {
+      if (err) {
+        res.status(500).json({
+          success: false,
+          message: "Failed to get attendance",
+          errorMessage: err.message,
+        });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: "Attendance get successfully",
+          data,
+        });
+      }
+    });
+};
+exports.getStudentAttendance = (req, res) => {
+  StudentAttendanceSchema.find()
+    .populate("presentStudent")
+    .populate("absentStudent")
+    .populate("batch")
+    .exec((err, data) => {
+      if (err) {
+        res.status(500).json({
+          success: false,
+          message: "Failed to get attendance",
+          errorMessage: err.message,
+        });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: "Attendance get successfully",
+          data,
+        });
+      }
+    });
+};
+
+exports.deleteAttendanceById= async(req,res)=>{
+  StudentAttendanceSchema.findByIdAndDelete(req.params.id,(err,data)=>{
+    if(err){
+      res.status(400).json({
+        msg:err.message
+      })
+    }
+    else{
+      res.status(200).json({
+        msg:"Attendance deleted sucessfully...",
+        data:data
+      })
+    }
+  })
+}
+exports.updateAttendanceById  = (req,res)=>{
+  StudentAttendanceSchema.findByIdAndUpdate(req.params.id,req.body,(err,data)=>{
+    if(err){
+      res.status(400).json({
+        msg:err.message
+      })
+    }
+    else{
+      res.status(200).json({
+        msg:"Attendance updated successfully",
+        data:data
+      })
+    }
+  })
+}
+
+

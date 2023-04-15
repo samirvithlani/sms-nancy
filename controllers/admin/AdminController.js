@@ -1,12 +1,17 @@
 const Bcrypt = require("bcrypt")
 const AdminSchema = require("../../schemas/admin/AdminSchema")
+const authTokenSchema = require("../../schemas/authTokenSchema")
+const generateToken = require("../../Util/Token/generateToken")
+const {generatePublicKey}=require("../../Util/generatePublicKey")
 //add admin
 exports.test =(req,res)=>{
     console.log("ok...")
 }
-exports.addAdmin=(req,res)=>{
+exports.addAdmin=async(req,res)=>{
+    console.log(req.body)
     const salt = Bcrypt.genSaltSync(10)
     const hash = Bcrypt.hashSync(req.body.password, salt)
+
     var AdminObj ={
         firstName:req.body.firstName,
         lastName:req.body.lastName,
@@ -23,10 +28,33 @@ exports.addAdmin=(req,res)=>{
             })
         }
         else{
-            res.status(200).json({
-                message:"Admin added successfully",
-                data:data
-            })
+            if(data!=null||data!=undefined){
+                const token = generateToken.generateToken(data)
+                const obj={
+
+                    token:token,
+                    user:data._id,
+                    secret:"secret",
+                    publicKey:generatePublicKey(16)
+
+
+                }
+                const tokenData = new authTokenSchema(obj)
+                tokenData.save((err,data)=>{
+                    if(err){
+                        res.status(401).json({
+                            message:err.message
+                        })
+                    }
+                    else{
+                        res.status(200).json({
+                            message:"Admin added successfully",
+                            data:data
+                        })
+                    }
+                })
+            }
+            
         }
     })
 }
@@ -95,10 +123,37 @@ exports.AdminLogin=(req,res)=>{
         else{
             if(data){
                 if(Bcrypt.compareSync(req.body.password,data.password)){
-                    res.status(200).json({
-                        msg:"Admin login successfully",
-                        data:data
+                    const refreshToken = generateToken.generateToken(data);
+
+                    //Get The Token Data
+                    authTokenModel.findOne({ user: data._id }, (err, data) => {
+
+                        if (err) {
+                            return res.status(400).json({
+                                message: err.message,
+                            })
+                        } else {
+                            //Update Refresh Token
+                            authTokenModel.findByIdAndUpdate(data._id, { token: refreshToken }, (err, data) => {
+                                if (err) {
+                                    return res.status(400).json({
+                                        message: err.message,
+                                    })
+                                } else {
+                                    return res.status(200).json({
+                                        message: "Admin Login successfully",
+                                        token: refreshToken
+
+                                    })
+                                }
+                            })
+
+                        }
                     })
+                    // res.status(200).json({
+                    //     msg:"Admin login successfully",
+                    //     data:data
+                    // })
                 }
                 else{
                     res.status(400).json({

@@ -18,6 +18,7 @@ const AttendanceRoutes = require("./routes/AttendanceRoutes");
 const PaymentRoutes = require("./routes/PaymentRoutes");
 const AssignmentRoutes = require("./routes/AssignmentRoutes");
 const UploadRoutes = require("./routes/uploadRoutes");
+const BatchRoutes = require("./routes/faculty/BatchRoutes");
 
 
 
@@ -30,6 +31,7 @@ app.use("/attendance", AttendanceRoutes)
 app.use("/payment", PaymentRoutes)
 app.use("/assignment", AssignmentRoutes)
 app.use("/upload", UploadRoutes)
+app.use("/batch", BatchRoutes)
 
 mongoose.connect("mongodb://127.0.0.1:27017/SMS-Nancy", (err) => {
   if (err) {
